@@ -1,0 +1,17 @@
+<div appViewPanel>
+    <h2 class="text-2xl font-bold mb-4">Order Summary</h2>
+    <div class="space-y-3 text-lg pt-4">
+        <div class="flex justify-between">
+            <span>Subtotal</span>
+            <span>{{ subtotal() | currency }}</span>
+        </div>
+        <div class="flex justify-between">
+            <span>Tax (10%)</span>
+            <span>{{ tax() | currency }}</span>
+        </div>
+        <div class="flex justify-between font-semibold text-xl pt-3 border-t">
+            <span>Total</span>
+            <span>{{ total() | currency }}</span>
+        </div>
+    </div>
+</div>
