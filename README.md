@@ -113,7 +113,7 @@ For more information on using the Angular CLI, including detailed command refere
     - Activated list item
 
 
-// Enter NgRx Signals Store!
+// Enter NgRx Signals Store! Part 3
 
   - Introduction to the NgRx Signals Store
   - Refactoring products grid to signal store
@@ -154,3 +154,15 @@ For more information on using the Angular CLI, including detailed command refere
     - Providing inputs for configuration <- (Back Button)
     - Content Projection
       - "Project" content from parent <- (Product Card Component)
+
+// Buiding the product cart - part 4
+
+  - Adding cart state + add to cart method
+  - Building the product cart page
+    - Cart Items with Quantity Selector
+    - Wishlist tease section
+    - Summarize the order
+    
+  # Creating an Attribute Directive
+    - changes appearance or functionality DOM element
+    - Distinct from structual directive which can change structure of DOM
