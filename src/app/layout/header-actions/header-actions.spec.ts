@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 
 import { HeaderActions } from './header-actions';
 
@@ -8,7 +9,7 @@ describe('HeaderActions', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [HeaderActions]
+      imports: [HeaderActions, RouterTestingModule]
     })
     .compileComponents();
 

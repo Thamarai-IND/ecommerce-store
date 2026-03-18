@@ -1,45 +1,57 @@
-// Zoneless test bootstrap for Angular 20 applications.
-//
-// For zoneless apps we avoid loading full Zone.js in tests. However,
-// Angular internals sometimes check for the presence of `Zone` and call
-// `Zone.assertZonePatched()`. To satisfy those checks without enabling
-// full Zone behavior we provide a minimal, noop shim that implements the
-// small subset Angular expects during initialization.
+// Standard Angular test bootstrap
+// Load Zone.js core first so the runtime is patched before Angular loads.
+// Import the minimal runtime, then the testing helpers.
+import 'zone.js/dist/zone';
+import 'zone.js/testing';
 
-// Provide a minimal global Zone shim only if Zone is missing.
-if (typeof (globalThis as any).Zone === 'undefined') {
-  (globalThis as any).Zone = {
-    // Minimal current zone with run/runOutsideAngular helpers used by some libs.
-    current: {
-      run(fn: Function) {
-        return fn();
-      },
-      runOutsideAngular(fn: Function) {
-        return fn();
-      },
-      // onError is used in a few places; provide a subscribe noop
-      onError: { subscribe: () => ({ unsubscribe: () => {} }) },
-    },
-    // Angular calls this during setup; make it a no-op.
-    assertZonePatched() {},
-    // Zone.__symbol__ is sometimes referenced; provide a simple implementation.
-    __symbol__(name: string) {
-      return `__zone_symbol__${name}`;
-    },
-  };
-}
-
-// Initialize the Angular testing environment.
 import { getTestBed } from '@angular/core/testing';
 import {
   BrowserDynamicTestingModule,
   platformBrowserDynamicTesting,
 } from '@angular/platform-browser-dynamic/testing';
+import { TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
+import { ActivatedRoute } from '@angular/router';
+import { of } from 'rxjs';
 
 getTestBed().initTestEnvironment(
   BrowserDynamicTestingModule,
   platformBrowserDynamicTesting()
 );
+
+// Configure a base testing module that includes RouterTestingModule so
+// standalone components that use router directives/providers work by default.
+getTestBed().configureTestingModule({ imports: [RouterTestingModule] });
+
+// Provide a global ActivatedRoute mock as a fallback for any test that
+// depends on it at component construction time.
+TestBed.overrideProvider(ActivatedRoute, {
+  useValue: {
+    snapshot: { params: {} },
+    params: of({}),
+    queryParams: of({}),
+  },
+});
+
+// Inject RouterTestingModule and a simple ActivatedRoute mock into every
+// TestBed.configureTestingModule call so standalone components and tests
+// relying on routing providers don't fail with NG0201.
+const _origConfigure = (TestBed as any).configureTestingModule.bind(TestBed);
+(TestBed as any).configureTestingModule = (moduleDef: any = {}) => {
+  moduleDef.imports = [...(moduleDef.imports || []), RouterTestingModule];
+  moduleDef.providers = [
+    ...(moduleDef.providers || []),
+    {
+      provide: ActivatedRoute,
+      useValue: {
+        snapshot: { params: {} },
+        params: of({}),
+        queryParams: of({}),
+      },
+    },
+  ];
+  return _origConfigure(moduleDef);
+};
 
 // Auto-load all spec files
 declare const require: any;

@@ -14,6 +14,22 @@ describe('ProductCard', () => {
 
     fixture = TestBed.createComponent(ProductCard);
     component = fixture.componentInstance;
+    // Provide a minimal Product input as a signal-like function because
+    // the component expects `product` to be a signal (callable) via
+    // `input.required()` API.
+    const mockProduct = {
+      id: 'test',
+      name: 'Test Product',
+      description: 'A product used in tests',
+      price: 1,
+      imageUrl: '',
+      images: [],
+      rating: 0,
+      reviewCount: 0,
+      inStock: true,
+      category: 'test',
+    };
+    (component as any).product = (() => mockProduct) as any;
     fixture.detectChanges();
   });
 
