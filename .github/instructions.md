@@ -25,7 +25,7 @@ npm test
 - Trigger: On every commit and pull request.
 - CI should run the following checks (see `.github/workflows/*` for implementation):
   - Frontend (Angular):
-    - `npm ci` succeeds
+    - `npm ci` then `npm run build -- --configuration production` succeeds
     - `npm test` runs and reports results (Karma/Jasmine)
     - Component sanity and visual checks as appropriate (project does not use Storybook)
     - Accessibility checks for key pages/components (a11y addon or axe)
@@ -67,5 +67,5 @@ If CI passes and the review is satisfied:
 - If coverage ≥ 80%: proceed with PR workflow
 
 ## Small automation suggestions (optional)
-- Add a GitHub Actions workflow that runs `npm ci`, and `npm test -- --watch=false` on PRs
+- Add a GitHub Actions workflow that runs `npm ci`, `npm run build -- --configuration production`, and `npm test -- --watch=false` on PRs
 - Consider adding a lightweight accessibility check (axe) as part of CI for critical pages
