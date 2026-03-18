@@ -13,16 +13,12 @@ npm ci
 npm start
 
 # Run unit tests (Karma)
-
+# Run unit tests (Karma)
+npm test
 
 # Build production bundle
 npm run build -- --configuration production
 
-# Run Storybook locally
-npm run storybook
-
-# Build Storybook static site
-npm run build-storybook
 ```
 
 ## Code Review Workflow
@@ -31,7 +27,7 @@ npm run build-storybook
   - Frontend (Angular):
     - `npm ci` then `npm run build -- --configuration production` succeeds
     - `npm test` runs and reports results (Karma/Jasmine)
-    - Storybook builds (`npm run build-storybook`) for visual regression / component sanity
+    - Component sanity and visual checks as appropriate (project does not use Storybook)
     - Accessibility checks for key pages/components (a11y addon or axe)
     - Angular best-practices review: modular structure, use of OnPush where appropriate, no large change-detection pitfalls, lazy-loading routes
   - General:
@@ -55,7 +51,7 @@ If CI passes and the review is satisfied:
 - Create a Pull Request titled: `Code Review Passed - Ready for Merge`
 - Body should include:
   - Short summary of the change
-  - Which checks were run (build, tests, storybook)
+  - Which checks were run (build, tests, accessibility checks)
   - Any manual testing performed (browsers, devices)
 - Add reviewer(s): `@Thamarai-IND` (or usual team reviewers)
 
@@ -71,5 +67,5 @@ If CI passes and the review is satisfied:
 - If coverage ≥ 80%: proceed with PR workflow
 
 ## Small automation suggestions (optional)
-- Add a GitHub Actions workflow that runs `npm ci`, `npm run build -- --configuration production`, `npm test -- --watch=false`, and `npm run build-storybook` on PRs
-- Consider adding a lightweight a11y check (axe) as part of CI for critical pages
+- Add a GitHub Actions workflow that runs `npm ci`, `npm run build -- --configuration production`, and `npm test -- --watch=false` on PRs
+- Consider adding a lightweight accessibility check (axe) as part of CI for critical pages
