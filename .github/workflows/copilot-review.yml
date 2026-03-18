@@ -9,6 +9,12 @@ on:
 jobs:
   code-review:
     runs-on: ubuntu-latest
+    env:
+      # Opt into Node.js 24 for the runtime that executes JavaScript actions
+      # This addresses the deprecation warning about Node.js 20 for actions such as
+      # actions/checkout and actions/setup-node. GitHub will default to Node 24
+      # on June 2, 2026; setting this now avoids warnings and early migration issues.
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
