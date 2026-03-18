@@ -1,41 +1,75 @@
-# Copilot Code Review & Code Agent Instructions
+# Repository-specific Code Review & Code Agent Instructions
+
+This repository is an Angular frontend application (no backend). The guidance below is tailored to the project's scripts and tooling (see `package.json`).
+
+## Quick local commands
+Use these to reproduce CI checks locally:
+
+```bash
+# Install deps
+npm ci
+
+# Serve locally
+npm start
+
+# Run unit tests (Karma)
+
+
+# Build production bundle
+npm run build -- --configuration production
+
+# Run Storybook locally
+npm run storybook
+
+# Build Storybook static site
+npm run build-storybook
+```
 
 ## Code Review Workflow
-- Trigger: On every commit or pull request.
-- Checks:
-  - **Frontend (Angular)**:
-    - Ensure `ng build --configuration production` passes
-    - Accessibility compliance (ARIA roles, semantic HTML, color contrast)
-    - Angular best practices (OnPush change detection, modular structure, lazy loading)
-  - **Backend (Node.js + MongoDB)**:
-    - API route validation, error handling, security (JWT/OAuth)
-    - Performance and scalability patterns
-  - **General**:
-    - ESLint/Prettier formatting
-    - Unit test coverage ≥ 80%
-    - Vulnerability scan (`npm audit`)
+- Trigger: On every commit and pull request.
+- CI should run the following checks (see `.github/workflows/*` for implementation):
+  - Frontend (Angular):
+    - `npm ci` then `npm run build -- --configuration production` succeeds
+    - `npm test` runs and reports results (Karma/Jasmine)
+    - Storybook builds (`npm run build-storybook`) for visual regression / component sanity
+    - Accessibility checks for key pages/components (a11y addon or axe)
+    - Angular best-practices review: modular structure, use of OnPush where appropriate, no large change-detection pitfalls, lazy-loading routes
+  - General:
+    - Prettier formatting (project has Prettier config)
+    - Unit test coverage (see rules below)
+    - Optional: `npm audit` in CI for quick vulnerability scan
 
 ## Issue Creation
-- If problems are found:
-  - Create a GitHub Issue titled: `Code Review Issue - <short description>`
-  - Body: Include checklist of problems, suggested fixes, and affected files
-  - Assign default: `@Thamaraiselvan` (or another assignee if specified)
+If CI or the reviewer finds problems:
+- Create a GitHub Issue titled: `Code Review Issue - <short description>`
+- Body should include:
+  - Short summary of the failure
+  - Reproduction steps (commands, failing test names)
+  - Files and line pointers (where applicable)
+  - Suggested fix or guidance
+  - Minimal failing snippet or stack trace
+- Default assignee: `@Thamarai-IND`
 
 ## Pull Request Creation
-- If no problems are found:
-  - Create a Pull Request titled: `Code Review Passed - Ready for Merge`
-  - Body: Summarize review outcome and confirm no issues
-  - Assign default reviewer: `@Thamaraiselvan` (or superior if specified)
+If CI passes and the review is satisfied:
+- Create a Pull Request titled: `Code Review Passed - Ready for Merge`
+- Body should include:
+  - Short summary of the change
+  - Which checks were run (build, tests, storybook)
+  - Any manual testing performed (browsers, devices)
+- Add reviewer(s): `@Thamarai-IND` (or usual team reviewers)
 
-## Guidelines
-- Always provide actionable feedback
-- Use checklist format in issues/PRs
-- Respect branch naming and commit conventions
+## Guidelines for Reviewers
+- Provide actionable, prioritized feedback (what's wrong, why, and a concrete fix)
+- Use checklist items in PR descriptions for each CI step
+- Keep reviews focused: correctness, accessibility, performance, and maintainability
 
 ## Test Coverage Rules
-- Minimum coverage threshold: **80%**
+- Goal coverage threshold: **80%** (unit tests via Karma/coverage reporter)
 - If coverage < 80%:
-  - Copilot AI should create an Issue titled: `Code Review Issue - Coverage Below Threshold`
-  - Include coverage report details and suggest adding more unit tests
-- If coverage ≥ 80%:
-  - Continue with normal PR creation workflow
+  - Open an Issue titled `Code Review Issue - Coverage Below Threshold` with the coverage summary and suggestions for tests to add
+- If coverage ≥ 80%: proceed with PR workflow
+
+## Small automation suggestions (optional)
+- Add a GitHub Actions workflow that runs `npm ci`, `npm run build -- --configuration production`, `npm test -- --watch=false`, and `npm run build-storybook` on PRs
+- Consider adding a lightweight a11y check (axe) as part of CI for critical pages
