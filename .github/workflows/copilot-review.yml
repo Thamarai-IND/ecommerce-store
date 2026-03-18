@@ -1,26 +1,18 @@
-name: Copilot Code Review
+name: Copilot Code Review (Frontend Only)
 
 env:
-  # Opt into Node.js 24 for JavaScript actions at workflow level. Placing this
-  # at the top level ensures it is available earlier in the run (for actions
-  # that execute during job setup) and should silence the Node 20 deprecation
-  # warnings for actions such as actions/checkout and actions/setup-node.
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, master]
   pull_request:
-    branches: [main, develop]
+    branches: [main, master]
 
 jobs:
-  code-review:
+  frontend-review:
     runs-on: ubuntu-latest
     env:
-      # Opt into Node.js 24 for the runtime that executes JavaScript actions
-      # This addresses the deprecation warning about Node.js 20 for actions such as
-      # actions/checkout and actions/setup-node. GitHub will default to Node 24
-      # on June 2, 2026; setting this now avoids warnings and early migration issues.
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - name: Checkout code
@@ -29,38 +21,34 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          # Node 24 is supported for this Angular 20 project; change if you prefer 20
           node-version: 24
 
       - name: Install dependencies
         run: npm ci
 
       - name: Prettier check
-        # Project has Prettier config; run a check instead of a missing `lint` script
         run: npx prettier --check "src/**/*" || true
 
       - name: Build Angular frontend
         run: npm run build -- --configuration production
 
       - name: Run unit tests with coverage
-        # Use headless mode and disable watch to run in CI
         run: npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage
 
-      - name: Collect coverage (from Karma coverage-summary)
+      - name: Collect coverage
         id: coverage
         run: |
-          # Default to 0 if no summary produced
           COVERAGE=0
           if [ -f coverage/coverage-summary.json ]; then
             COVERAGE=$(node -e "const fs=require('fs'); const p=JSON.parse(fs.readFileSync('coverage/coverage-summary.json','utf8')).total.statements.pct; console.log(Math.round(p));")
           fi
           echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
 
-      - name: Run accessibility checks (placeholder)
-        run: echo "Add repository-specific a11y checks (axe) if desired"
+      - name: Accessibility checks (placeholder)
+        run: echo "Add axe-core or pa11y checks here"
 
-      - name: Run vulnerability scan (npm audit quick check)
-        run: npm audit --audit-level=high || echo "npm audit found issues (non-fatal here)"
+      - name: Vulnerability scan
+        run: npm audit --audit-level=high || echo "npm audit found issues (non-fatal)"
 
       - name: Create Issue if coverage below 80%
         if: ${{ steps.coverage.outputs.coverage && steps.coverage.outputs.coverage < '80' }}
@@ -72,7 +60,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               title: `Code Review Issue - Coverage Below Threshold`,
-              body: `Unit test coverage is below 80%. Please add more tests.\n\nCoverage: ${cov}%\n\nRun locally: npm ci && npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage`,
+              body: `Unit test coverage is below 80%. Please add more tests.\n\nCoverage: ${cov}%`,
               assignees: ['Thamarai-IND']
             })
 
@@ -85,5 +73,5 @@ jobs:
               issue_number: context.payload.pull_request.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: 'Code Review Passed - Ready for Merge. All checks passed and coverage is at or above 80%.'
+              body: 'Code Review Passed - Ready for Merge. All frontend checks passed and coverage is at or above 80%.'
             })
