@@ -1,5 +1,12 @@
 name: Copilot Code Review
 
+env:
+  # Opt into Node.js 24 for JavaScript actions at workflow level. Placing this
+  # at the top level ensures it is available earlier in the run (for actions
+  # that execute during job setup) and should silence the Node 20 deprecation
+  # warnings for actions such as actions/checkout and actions/setup-node.
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
 on:
   push:
     branches: [main, develop]
