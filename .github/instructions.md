@@ -17,7 +17,7 @@ npm start
 npm test
 
 # Build production bundle
-npm run build -- --configuration production
+# npm run build -- --configuration production
 
 ```
 
