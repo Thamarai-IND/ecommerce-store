@@ -29,8 +29,8 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          # Node 18 is supported for this Angular 20 project; change if you prefer 20
-          node-version: 18
+          # Node 24 is supported for this Angular 20 project; change if you prefer 20
+          node-version: 24
 
       - name: Install dependencies
         run: npm ci
@@ -57,7 +57,7 @@ jobs:
           echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
 
       - name: Run accessibility checks (placeholder)
-        run: echo "Add repository-specific a11y checks (axe or storybook a11y) if desired"
+        run: echo "Add repository-specific a11y checks (axe) if desired"
 
       - name: Run vulnerability scan (npm audit quick check)
         run: npm audit --audit-level=high || echo "npm audit found issues (non-fatal here)"
